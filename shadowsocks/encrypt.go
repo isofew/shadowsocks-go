@@ -150,6 +150,16 @@ func newSalsa20Stream(key, iv []byte, _ DecOrEnc) (cipher.Stream, error) {
 	return &c, nil
 }
 
+type plainStreamCipher struct {}
+
+func (c *plainStreamCipher) XORKeyStream(dst, src []byte) {
+	copy(dst, src)
+}
+
+func newPlainStream(key, iv []byte, _ DecOrEnc) (cipher.Stream, error) {
+	return &plainStreamCipher{}, nil
+}
+
 type cipherInfo struct {
 	keyLen    int
 	ivLen     int
@@ -170,6 +180,7 @@ var cipherMethod = map[string]*cipherInfo{
 	"chacha20":      {32, 8, newChaCha20Stream},
 	"chacha20-ietf": {32, 12, newChaCha20IETFStream},
 	"salsa20":       {32, 8, newSalsa20Stream},
+	"plain":         {0, 0, newPlainStream},
 }
 
 func CheckCipherMethod(method string) error {
